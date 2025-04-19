@@ -66,6 +66,42 @@ class Net(nn.Module):
         x = self.linear_output(x)
         return x
 
+class NeuralNetwork(nn.Module):
+    def __init__(
+        self,
+        embedding_dim: int,
+    ):
+        super().__init__()
+        self.ff1 = nn.Linear(embedding_dim, 16 * embedding_dim)
+        self.ff2 = nn.Linear(16 * embedding_dim, 8 * embedding_dim)
+        self.ff3 = nn.Linear(8 * embedding_dim, 4 * embedding_dim)
+        self.ff4 = nn.Linear(4 * embedding_dim, 2 * embedding_dim)
+        self.ff5 = nn.Linear(2 * embedding_dim, embedding_dim)
+        self.gelu = nn.GELU()
+        self.dropout = nn.Dropout(p=0.1)
+        self.layernorm = nn.LayerNorm(normalized_shape=embedding_dim)
+
+        self.forward_layer = nn.Sequential(
+            self.ff1,
+            self.gelu,
+            self.dropout,
+            self.ff2,
+            self.gelu,
+            self.dropout,
+            self.ff3,
+            self.gelu,
+            self.dropout,
+            self.ff4,
+            self.gelu,
+            self.dropout,
+            self.ff5,
+            self.layernorm
+        )
+
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.forward_layer(x)
+        return x
+
 
 class UniversalModel(pl.LightningModule):
     def __init__(
@@ -89,11 +125,13 @@ class UniversalModel(pl.LightningModule):
             hidden_size_thin=hidden_size_thin,
             hidden_size_wide=hidden_size_wide,
         )
+        self.neural_network = NeuralNetwork(embedding_dim=embedding_dim)
         self.metric_calculator = metric_calculator
         self.loss_fn = loss_fn
         self.metrics_tracker = metrics_tracker
 
     def forward(self, x) -> Tensor:
+        x = self.neural_network(x)
         return self.net(x)
 
     def configure_optimizers(self) -> optim.Optimizer:
