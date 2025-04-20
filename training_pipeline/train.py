@@ -124,22 +124,23 @@ def main(params) -> None:
         api_key=params.neptune_api_token,
         name=params.log_name,
     )
-    data_dir = DataDir(data_dir=Path(params.data_dir))
-    task_constructor = TaskConstructor(data_dir=data_dir)
-    score_dir = Path(params.score_dir) if params.score_dir else None
-
-    run_tasks(
-        neptune_logger_factory=neptune_logger_factory,
-        tasks=tasks,
-        task_constructor=task_constructor,
-        data_dir=data_dir,
-        embeddings_dir=Path(params.embeddings_dir),
-        num_workers=params.num_workers,
-        accelerator=params.accelerator,
-        devices=parse_devices(params.devices),
-        score_dir=score_dir,
-        disable_relevant_clients_check=params.disable_relevant_clients_check,
-    )
+    for i in range(77, -1, 7):
+        data_dir = DataDir(data_dir=Path(params.data_dir))
+        task_constructor = TaskConstructor(data_dir=data_dir)
+        score_dir = Path(params.score_dir) if params.score_dir else None
+        run_tasks(
+            neptune_logger_factory=neptune_logger_factory,
+            tasks=tasks,
+            task_constructor=task_constructor,
+            data_dir=data_dir,
+            embeddings_dir=Path(params.embeddings_dir),
+            num_workers=params.num_workers,
+            accelerator=params.accelerator,
+            devices=parse_devices(params.devices),
+            score_dir=score_dir,
+            disable_relevant_clients_check=params.disable_relevant_clients_check,
+            i=i
+        )
 
 
 if __name__ == "__main__":

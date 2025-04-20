@@ -134,7 +134,7 @@ class DataSplitter:
                 self.target_events["train_target"] = train_target
                 self.target_events["validation_target"] = validation_target
 
-    def save_splits(self) -> None:
+    def save_splits(self, day) -> None:
         """
         Saves splitted data into input and target subdirectories of competition data folder.
         """
@@ -142,14 +142,14 @@ class DataSplitter:
             msg = f"Saving {event_type} train input"
             logger.info(msg=msg)
             events.to_parquet(
-                self.challenge_data_dir.input_dir / f"{event_type}.parquet", index=False
+                self.challenge_data_dir.input_dir / f"{event_type}-{day}.parquet", index=False
             )
 
         for target_type, events in self.target_events.items():
             msg = f"Saving {target_type}"
             logger.info(msg=msg)
             events.to_parquet(
-                self.challenge_data_dir.target_dir / f"{target_type}.parquet",
+                self.challenge_data_dir.target_dir / f"{target_type}-{day}.parquet",
                 index=False,
             )
 
@@ -167,6 +167,12 @@ def get_parser() -> argparse.ArgumentParser:
         required=True,
         help="Competition data directory which should consists of event files, product properties and two subdirectories — input and target",
     )
+    parser.add_argument(
+        "--days-before-end",
+        type=int,
+        default=0,
+        help="Number of days before the end date to use for splitting",
+    )
     return parser
 
 
@@ -179,15 +185,17 @@ def main():
     product_buy = pd.read_parquet(
         challenge_data_dir.data_dir / f"{EventTypes.PRODUCT_BUY.value}.parquet"
     )
-    end_date = pd.to_datetime(product_buy["timestamp"].max())
-
-    splitter = DataSplitter(
-        challenge_data_dir=challenge_data_dir,
-        days_in_target=DAYS_IN_TARGET,
-        end_date=end_date,
-    )
-    splitter.split()
-    splitter.save_splits()
+    end_date_first = pd.to_datetime(product_buy["timestamp"].max())
+    for i in range(56, 80, 7):
+        end_date = end_date_first - pd.Timedelta(days=i)
+        end_date -= pd.Timedelta(days=params.days_before_end)
+        splitter = DataSplitter(
+            challenge_data_dir=challenge_data_dir,
+            days_in_target=DAYS_IN_TARGET,
+            end_date=end_date,
+        )
+        splitter.split()
+        splitter.save_splits(i)
 
 
 if __name__ == "__main__":

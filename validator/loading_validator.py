@@ -20,15 +20,15 @@ class LoadingValidator:
     Verifies if path exist and if embddings and client_ids can be loaded, then loads them for future use.
     """
 
-    def __init__(self, embeddings_dir: Path):
+    def __init__(self, embeddings_dir: Path, i: int = 0):
         """
         Initializes loading validator instance.
 
         Args:
             embeddings_dir (Path): path to directory with embeddings
         """
-        self._client_ids_pth = embeddings_dir / "client_ids.npy"
-        self._embeddings_pth = embeddings_dir / "embeddings.npy"
+        self._client_ids_pth = embeddings_dir / f"client_ids-{i}.npy"
+        self._embeddings_pth = embeddings_dir / f"embeddings-{i}.npy"
         self._embeddings = None
         self._client_ids = None
 

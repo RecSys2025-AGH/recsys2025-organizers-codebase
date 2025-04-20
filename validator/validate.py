@@ -19,6 +19,7 @@ def validate_and_load_embeddings(
     embeddings_dir: Path,
     max_embedding_dim: int,
     disable_relevant_clients_check: bool,
+    i: int = 0,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Method for loading and validating embeddings.
@@ -38,7 +39,7 @@ def validate_and_load_embeddings(
     Returns:
         Tuple[np.ndarray, np.ndarray]: client_ids and embeddings
     """
-    loading_validator = LoadingValidator(embeddings_dir=embeddings_dir)
+    loading_validator = LoadingValidator(embeddings_dir=embeddings_dir, i=i)
     err_messages = loading_validator.check_and_load()
     if err_messages:
         for err_msg in err_messages:

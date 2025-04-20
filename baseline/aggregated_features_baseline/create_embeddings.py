@@ -26,7 +26,7 @@ def load_relevant_clients_ids(input_dir: Path) -> np.ndarray:
 
 
 def save_embeddings(
-    embeddings_dir: Path, embeddings: np.ndarray, client_ids: np.ndarray
+    embeddings_dir: Path, embeddings: np.ndarray, client_ids: np.ndarray, i: int
 ):
     """
     Function creates embeddings directory and saves embeddings in competition entry format.
@@ -38,8 +38,8 @@ def save_embeddings(
     """
     logger.info("Saving embeddings")
     embeddings_dir.mkdir(parents=True, exist_ok=True)
-    np.save(embeddings_dir / "embeddings.npy", embeddings)
-    np.save(embeddings_dir / "client_ids.npy", client_ids)
+    np.save(embeddings_dir / f"embeddings-{i}.npy", embeddings)
+    np.save(embeddings_dir / f"client_ids-{i}.npy", client_ids)
 
 
 def create_embeddings(
@@ -47,6 +47,7 @@ def create_embeddings(
     num_days: List[int],
     top_n: int,
     relevant_client_ids: np.ndarray,
+    i: int = 0,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate and merge user representation embeddings for specified event types.
@@ -74,7 +75,7 @@ def create_embeddings(
     for event_type in EVENT_TYPE_TO_COLUMNS.keys():
         logger.info("Generating features for %s event type", event_type.value)
         logger.info("Loading data...")
-        event_df = load_with_properties(data_dir=data_dir, event_type=event_type.value)
+        event_df = load_with_properties(data_dir=data_dir, event_type=event_type.value, i=i)
         event_df["timestamp"] = pd.to_datetime(event_df.timestamp)
         logger.info("Generating features...")
         aggregator.generate_features(
@@ -120,23 +121,26 @@ def get_parser() -> argparse.ArgumentParser:
 
 
 def main(params):
-    data_dir = DataDir(Path(params.data_dir))
+    for i in range(0, 80, 7):
+        data_dir = DataDir(Path(params.data_dir))
 
-    embeddings_dir = Path(params.embeddings_dir)
+        embeddings_dir = Path(params.embeddings_dir)
 
-    relevant_client_ids = load_relevant_clients_ids(input_dir=data_dir.input_dir)
-    client_ids, embeddings = create_embeddings(
-        data_dir=data_dir,
-        num_days=params.num_days,
-        top_n=params.top_n,
-        relevant_client_ids=relevant_client_ids,
-    )
+        relevant_client_ids = load_relevant_clients_ids(input_dir=data_dir.input_dir)
+        client_ids, embeddings = create_embeddings(
+            data_dir=data_dir,
+            num_days=params.num_days,
+            top_n=params.top_n,
+            relevant_client_ids=relevant_client_ids,
+            i=i
+        )
 
-    save_embeddings(
-        client_ids=client_ids,
-        embeddings=embeddings,
-        embeddings_dir=embeddings_dir,
-    )
+        save_embeddings(
+            client_ids=client_ids,
+            embeddings=embeddings,
+            embeddings_dir=embeddings_dir,
+            i=i
+        )
 
 
 if __name__ == "__main__":

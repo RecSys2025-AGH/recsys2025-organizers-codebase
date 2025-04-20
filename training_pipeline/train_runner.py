@@ -113,6 +113,7 @@ def run_tasks(
     devices: List[int] | str | int,
     score_dir: Path | None,
     disable_relevant_clients_check: bool,
+    i: int = 0
 ) -> None:
     """
     Function for running a task, i.e. setting up the training, and the starting the training. This method first
@@ -136,8 +137,9 @@ def run_tasks(
         embeddings_dir=embeddings_dir,
         max_embedding_dim=MAX_EMBEDDING_DIM,
         disable_relevant_clients_check=disable_relevant_clients_check,
+        i=i
     )
-    target_data = TargetData.read_from_dir(target_dir=data_dir.target_dir)
+    target_data = TargetData.read_from_dir(target_dir=data_dir.target_dir, i=i) 
     metrics_aggregator = MetricsAggregator()
     for task in tasks:
         logger.info("Running on %s", task.value)

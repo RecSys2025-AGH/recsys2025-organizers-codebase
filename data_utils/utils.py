@@ -24,7 +24,7 @@ def join_properties(
     return joined_df
 
 
-def load_with_properties(data_dir: DataDir, event_type: str) -> pd.DataFrame:
+def load_with_properties(data_dir: DataDir, event_type: str, i: int) -> pd.DataFrame:
     """
     This function load dataset for given event type. If event type admits sku column, then product properties are joined.
     Args:
@@ -33,7 +33,7 @@ def load_with_properties(data_dir: DataDir, event_type: str) -> pd.DataFrame:
     Returns:
         pd.DataFrame: events DataFrame with product joined properties if available.
     """
-    event_df = pd.read_parquet(data_dir.input_dir / f"{event_type}.parquet")
+    event_df = pd.read_parquet(data_dir.input_dir / f"{event_type}-{i}.parquet")
     if event_type not in ["page_visit", "search_query"]:
         properties_df = pd.read_parquet(data_dir.properties_file)
         return join_properties(event_df=event_df, properties_df=properties_df)
