@@ -97,10 +97,10 @@ def run_training(
         metrics_tracker=task_settings.metrics_tracker,
     )
     if f"model_nn_{i}.pth" in files:
-        model.neural_network.load_state_dict(torch.load(f"model{i+7}.pth"))
+        model.neural_network.load_state_dict(torch.load(f"model_nn_{i}.pth"))
         print(f"NN {i} loaded")
     elif f"model_nn_{i+7}.pth" in files:
-        model.neural_network.load_state_dict(torch.load(f"model{i+7}.pth"))
+        model.neural_network.load_state_dict(torch.load(f"model_nn_{i+7}.pth"))
         print(f"NN {i+7} loaded")
     else:
         print("NN not found, training new model")
