@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 import pytorch_lightning as pl
+import torch
 
 from pathlib import Path
 from typing import List
@@ -100,6 +101,8 @@ def run_training(
     )
 
     trainer.fit(model=model, datamodule=data)
+
+    torch.save(model.neural_network.state_dict(), "../model/model.pth")
 
 
 def run_tasks(
