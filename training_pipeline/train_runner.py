@@ -2,6 +2,7 @@ import logging
 import numpy as np
 import pytorch_lightning as pl
 import torch
+import os
 
 from pathlib import Path
 from typing import List
@@ -80,7 +81,10 @@ def run_training(
         batch_size=BATCH_SIZE,
         num_workers=num_workers,
     )
+    folder_path = './'
+    files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
 
+    
     model = UniversalModel(
         embedding_dim=embeddings.shape[1],
         output_dim=task_settings.target_calculator.target_dim,
@@ -91,6 +95,11 @@ def run_training(
         loss_fn=task_settings.loss_fn,
         metrics_tracker=task_settings.metrics_tracker,
     )
+    if f"model{i+7}.pth" in files:
+        model.load_state_dict(torch.load(f"model{i+7}.pth"))
+        print("Model loaded")
+    else:
+        print("Model not found, training new model")
 
     trainer = pl.Trainer(
         accelerator=accelerator,
@@ -104,7 +113,7 @@ def run_training(
 
     trainer.fit(model=model, datamodule=data)
 
-    torch.save(model.neural_network.state_dict(), f"../model/model{i}.pth")
+    torch.save(model.state_dict(), f"model{i}.pth")
 
 
 def run_tasks(
