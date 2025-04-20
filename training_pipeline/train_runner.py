@@ -99,7 +99,7 @@ def run_training(
     if f"model_nn_{i}.pth" in files:
         model.neural_network.load_state_dict(torch.load(f"model{i+7}.pth"))
         print(f"NN {i} loaded")
-    if f"model_nn_{i+7}.pth" in files:
+    elif f"model_nn_{i+7}.pth" in files:
         model.neural_network.load_state_dict(torch.load(f"model{i+7}.pth"))
         print(f"NN {i+7} loaded")
     else:
