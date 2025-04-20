@@ -57,6 +57,7 @@ def run_training(
     devices: List[int] | str | int,
     neptune_logger: NeptuneLogger,
     i: int = 0,
+    task_name: str = "task",
 ) -> None:
     """
     Function for running the training of a model, with all the training
@@ -95,11 +96,21 @@ def run_training(
         loss_fn=task_settings.loss_fn,
         metrics_tracker=task_settings.metrics_tracker,
     )
-    if f"model{i+7}.pth" in files:
-        model.load_state_dict(torch.load(f"model{i+7}.pth"))
-        print("Model loaded")
+    if f"model_nn_{i}.pth" in files:
+        model.neural_network.load_state_dict(torch.load(f"model{i+7}.pth"))
+        print(f"NN {i} loaded")
+    if f"model_nn_{i+7}.pth" in files:
+        model.neural_network.load_state_dict(torch.load(f"model{i+7}.pth"))
+        print(f"NN {i+7} loaded")
+    else:
+        print("NN not found, training new model")
+
+    if f"model_net_{task_name}_{i+7}.pth" in files:
+        model.net.load_state_dict(torch.load(f"model_net_{task_name}_{i+7}.pth"))
+        print("Net loaded")
     else:
         print("Model not found, training new model")
+    
 
     trainer = pl.Trainer(
         accelerator=accelerator,
@@ -113,7 +124,8 @@ def run_training(
 
     trainer.fit(model=model, datamodule=data)
 
-    torch.save(model.state_dict(), f"model{i}.pth")
+    torch.save(model.neural_network.state_dict(), f"model_nn_{i}.pth")
+    torch.save(model.net.state_dict(), f"model_net_{task_name}_{i}.pth")
 
 
 def run_tasks(
@@ -127,7 +139,7 @@ def run_tasks(
     devices: List[int] | str | int,
     score_dir: Path | None,
     disable_relevant_clients_check: bool,
-    i: int = 0
+    i: int = 0,
 ) -> None:
     """
     Function for running a task, i.e. setting up the training, and the starting the training. This method first
@@ -181,7 +193,8 @@ def run_tasks(
             accelerator=accelerator,
             devices=devices,
             neptune_logger=neptune_logger,
-            i=i
+            i=i,
+            task_name = task.value
         )
         neptune_logger.experiment.stop()
 
