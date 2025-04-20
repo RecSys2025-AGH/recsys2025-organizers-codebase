@@ -99,6 +99,7 @@ def run_training(
         logger=neptune_logger,
         callbacks=RichProgressBar(leave=True),
         log_every_n_steps=5000,
+        check_val_every_n_epoch=3
     )
 
     trainer.fit(model=model, datamodule=data)
