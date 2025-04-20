@@ -55,6 +55,7 @@ def run_training(
     accelerator: str,
     devices: List[int] | str | int,
     neptune_logger: NeptuneLogger,
+    i: int = 0,
 ) -> None:
     """
     Function for running the training of a model, with all the training
@@ -102,7 +103,7 @@ def run_training(
 
     trainer.fit(model=model, datamodule=data)
 
-    torch.save(model.neural_network.state_dict(), "../model/model.pth")
+    torch.save(model.neural_network.state_dict(), f"../model/model{i}.pth")
 
 
 def run_tasks(
@@ -170,6 +171,7 @@ def run_tasks(
             accelerator=accelerator,
             devices=devices,
             neptune_logger=neptune_logger,
+            i=i
         )
         neptune_logger.experiment.stop()
 
