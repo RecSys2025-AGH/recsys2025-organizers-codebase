@@ -15,5 +15,5 @@ class TargetData:
     @classmethod
     def read_from_dir(cls, target_dir: Path, i: int):
         train_df = pd.read_parquet(target_dir / f"train_target-{i}.parquet")
-        validation_df = pd.read_parquet(target_dir / f"validation_target-{i}.parquet")
+        validation_df = pd.read_parquet(target_dir / f"validation_target-0.parquet")
         return cls(train_df, validation_df)

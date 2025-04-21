@@ -124,7 +124,7 @@ def main(params) -> None:
         api_key=params.neptune_api_token,
         name=params.log_name,
     )
-    for i in range(77, -1, -7):
+    for i in range(63, -1, -7):
         data_dir = DataDir(data_dir=Path(params.data_dir))
         task_constructor = TaskConstructor(data_dir=data_dir)
         score_dir = Path(params.score_dir) if params.score_dir else None
